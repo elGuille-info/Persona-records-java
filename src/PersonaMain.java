@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class PersonaMain {
     public static void main(String[] args) throws IOException {
         // El fichero donde se guardan las personas.
-        String ficPersonas = "personas.txt";
+        String ficPersonas = "./out/personas.txt";
         // Colección para guardar los datos de las personas.
         ArrayList<Persona> personas = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class PersonaMain {
      * @param ficPersonas El fichero donde están guardados los datos de las personas.
      * @param personas ArrayList de tipo Persona donde se agregarán los datos leídos.
      * @return True si se ha producido un error al leer los datos, en otro caso false.
-     * @throws FileNotFoundException
+     * @throws IOException Capturar el error.
      */
     static boolean leerDatos(String ficPersonas, ArrayList<Persona> personas) throws IOException {
         boolean hayError = false;
@@ -75,18 +75,25 @@ public class PersonaMain {
 
         System.out.printf("Leyendo los datos de %s.\n", ficPersonas);
         File fic = new File(ficPersonas);
-        if (fic.exists() == false) {
+        if (!fic.exists()) {
             System.out.println("No existe el fichero con los datos.");
             return true;
         }
-        BufferedReader sr = new BufferedReader(new FileReader(ficPersonas));
-        Persona p;
+        BufferedReader sr;
+        try {
+            sr = new BufferedReader(new FileReader(ficPersonas));
+        }
+        catch (Exception e) {
+            System.out.printf("Error al acceder al fichero de datos:\n%s.\n", e.getMessage());
+            return true;
+        }
+
         // Mientras haya datos en el fichero.
         while (sr.ready()) {
             // Leer el nombre o el fin del fichero.
             String s = sr.readLine();
             nombre = s;
-            // TODO: Se debe comprobar si hay datos en el fichero.
+            // Comprobar si hay datos en el fichero.
             if (sr.ready()) {
                 // Leer los apellidos.
                 apellidos = sr.readLine();
@@ -112,8 +119,7 @@ public class PersonaMain {
                 System.out.println("\tNo hay más datos, se finaliza la lectura de datos.");
                 break;
             }
-            p = new Persona(nombre, apellidos, fechaNacimiento);
-            personas.add(p);
+            personas.add(new Persona(nombre, apellidos, fechaNacimiento));
         }
         sr.close();
         return hayError;
@@ -124,7 +130,7 @@ public class PersonaMain {
      *
      * @param ficPersonas El fichero donde se guardarán los datos.
      * @param personas ArrayList de tipo Persona con los datos a guardar.
-     * @throws IOException
+     * @throws IOException Capturar el error.
      */
     static void guardarDatos(String ficPersonas, ArrayList<Persona> personas) throws IOException {
         BufferedWriter sw = new BufferedWriter( new FileWriter(ficPersonas));
@@ -145,7 +151,7 @@ public class PersonaMain {
      * Pide los datos de una persona para añadirlo a la colección personas del método main.
      *
      * @return Un valor Personal o null si se ha indicado no añadir y salir.
-     * @throws IOException
+     * @throws IOException Capturar el error.
      */
     static Persona addPersona() throws IOException {
         String res, nombre, apellidos;
@@ -154,7 +160,7 @@ public class PersonaMain {
 
         System.out.println("Indica los datos de la persona a añadir (0 en cualquier dato para no añadir y salir).");
         while (true) {
-            System.out.printf("Nombre: ");
+            System.out.print("Nombre: ");
             res = in.readLine();
             if (res.equals("0")) {
                 return null;
@@ -167,7 +173,7 @@ public class PersonaMain {
             break;
         }
         while (true) {
-            System.out.printf("Apellidos: ");
+            System.out.print("Apellidos: ");
             res = in.readLine();
             if (res.equals("0")) {
                 return null;
@@ -181,7 +187,7 @@ public class PersonaMain {
         }
 
         while (true) {
-            System.out.printf("Fecha nacimiento en formato (año-mes-día): ");
+            System.out.print("Fecha nacimiento en formato (año-mes-día): ");
             res = in.readLine();
             if (res.equals("0")) {
                 return null;
@@ -198,7 +204,6 @@ public class PersonaMain {
                 System.out.printf("\tLa fecha '%s' no es válida, debe estar en el formato yyyy-MM-dd.\n", res);
             }
         }
-        Persona p = new Persona(nombre, apellidos, fechaNacimiento);
-        return p;
+        return new Persona(nombre, apellidos, fechaNacimiento);
     }
 }
