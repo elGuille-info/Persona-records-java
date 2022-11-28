@@ -8,6 +8,11 @@ Este proyecto utiliza un record para los datos de una persona.<br>
 Lee los datos del fichero (si existe).<br>
 Pide más datos para añadir.<br>
 Guarda los datos en el fichero.<br>
+<br>
+Como argumento de la línea de comando se puede indicar el fichero de datos (path completo o parcial).<br>
+Si no se indica, se usa el predeterminado.<br>
+Si no existe el fichero, se intenta crear el directorio donde se guardará.<br>
+<br>
 
 <br>
 
