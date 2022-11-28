@@ -3,6 +3,7 @@
 > **NOTA:**
 > Esto solo es una recomandación de cómo hacerlo.
 
+<br>
 
 ```
 rem Abrir una venta de comandos (o la terminal)
