@@ -44,7 +44,7 @@ public record Persona(String nombre, String apellidos, LocalDate fechaNacimiento
         }
         // Si es el mismo mes, pero el día de nacimiento es posterior, aún no ha cumplido años.
         else if (fechaNacimiento.getMonthValue() == hoy.getMonthValue()) {
-            if (fechaNacimiento.getDayOfMonth() > hoy.getMonthValue()) {
+            if (fechaNacimiento.getDayOfMonth() > hoy.getDayOfMonth()) {
                 return edadThisYear() - 1;
             }
         }

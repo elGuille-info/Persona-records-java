@@ -6,24 +6,49 @@
 // Pide más datos para añadir.
 // Guarda los datos en el fichero.
 //
+// Como argumento de la línea de comando se puede indicar el fichero de datos (path completo o parcial).
+// Si no se indica, se usa el predeterminado.
+// Si no existe el fichero, se intenta crear el directorio donde se guardará.
+//
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class PersonaMain {
+
+    /**
+     * El nombre predeterminado del fichero con los datos.
+     */
+    private static String ficheroDatos = String.valueOf(Path.of(".", "out", "personas.txt"));
+
+    /**
+     * El punto de entrada.<br>
+     * Se puede indicar el path del fichero de datos. si no se indica se usará el indicado en ficheroDatos.
+     *
+     * @param args Si se indica, será el path del nombre del fichero a usar.
+     * @throws IOException Excepciones capturadas.
+     */
     public static void main(String[] args) throws IOException {
+        if (args.length > 0) {
+            ficheroDatos = args[0];
+            System.out.printf("\tSe utiliza el fichero de datos: '%s'.\n", ficheroDatos);
+        }
+        else {
+            System.out.println("\tNo se ha indicado el fichero de datos.");
+            System.out.printf("\tSe utiliza el predeterminado: '%s'.\n", ficheroDatos);
+        }
+
         // El fichero donde se guardan las personas.
-        String ficPersonas = "./out/personas.txt";
+        String ficPersonas = ficheroDatos;
         // Colección para guardar los datos de las personas.
         ArrayList<Persona> personas = new ArrayList<>();
 
-        if (leerDatos(ficPersonas, personas)) {
-            System.out.println("\nError al leer los datos de las personas.");
-            System.out.println();
-        }
-        else {
+        if (!leerDatos(ficPersonas, personas)) {
             System.out.println("\nLas personas del fichero son:");
             mostrarPersonas(personas);
         }
@@ -73,20 +98,23 @@ public class PersonaMain {
         String nombre, apellidos;
         LocalDate fechaNacimiento;
 
-        System.out.printf("Leyendo los datos de %s.\n", ficPersonas);
+        // Si no existe el fichero, nada que hacer.
         File fic = new File(ficPersonas);
         if (!fic.exists()) {
-            System.out.println("No existe el fichero con los datos.");
+            System.out.println("\tNo existe el fichero con los datos.");
             return true;
         }
+
         BufferedReader sr;
         try {
             sr = new BufferedReader(new FileReader(ficPersonas));
         }
         catch (Exception e) {
-            System.out.printf("Error al acceder al fichero de datos:\n%s.\n", e.getMessage());
+            System.out.printf("\tError al acceder al fichero de datos:\n%s.\n", e.getMessage());
             return true;
         }
+
+        System.out.printf("Leyendo los datos de %s.\n", ficPersonas);
 
         // Mientras haya datos en el fichero.
         while (sr.ready()) {
@@ -126,6 +154,36 @@ public class PersonaMain {
     }
 
     /**
+     * Si no existe el fichero, crear el directorio en caso de que no exista.
+     *
+     * @param fichero El fichero a comprobar si el path existe.
+     * @throws IOException Error que puede producirse.
+     */
+    static void ifNotExistMakeDir(String fichero) throws IOException {
+        // Comprobar si existe ese fichero
+        File fic = new File(fichero);
+        // Si no existe el fichero, intentar crear el directorio en caso de que no exista.
+        if (!fic.exists()) {
+            // El nombre del fichero (absoluto o parcial, según se haya indicado en fic).
+            String elPath = fic.getCanonicalPath();
+            // Para saber el directorio.
+            File fic2 = new File(elPath);
+            // El path del fichero.
+            elPath = fic2.getParent();
+            File dirDatos = new File(elPath);
+            if (!dirDatos.exists()) {
+                System.out.println("\tNo existe el directorio de datos.");
+                try {
+                    //dirDatos.mkdir();
+                    Files.createDirectories(Paths.get(elPath));
+                    System.out.println("\tSe ha creado el directorio de datos.");
+                } catch (SecurityException e) {
+                    System.out.printf("\tError al crear el directorio de datos: '%s'.\n", e);
+                }
+            }
+        }
+    }
+    /**
      * Guarda los datos de las personas en un fichero.
      *
      * @param ficPersonas El fichero donde se guardarán los datos.
@@ -133,6 +191,9 @@ public class PersonaMain {
      * @throws IOException Capturar el error.
      */
     static void guardarDatos(String ficPersonas, ArrayList<Persona> personas) throws IOException {
+        // Comprobar si el directorio de datos existe, si no, crearlo.
+        ifNotExistMakeDir(ficPersonas);
+
         BufferedWriter sw = new BufferedWriter( new FileWriter(ficPersonas));
         System.out.printf("Guardando los datos en %s.", ficPersonas);
         for (var p: personas) {
