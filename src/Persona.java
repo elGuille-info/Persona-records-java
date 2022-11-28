@@ -10,57 +10,67 @@
 //
 import java.time.LocalDate;
 
+/**
+ * Record Persona para almacenar el nombre, los apellidos y la fecha de nacimiento.<br>
+ * Con métodos para saber la edad actual, el día de la semana en que nació y mostrar por consola los datos.
+ *
+ * @param nombre El nombre de esta persona.
+ * @param apellidos Los apellidos de esta persona.
+ * @param fechaNacimiento La fecha de nacimiento de esta persona.
+ */
 public record Persona(String nombre, String apellidos, LocalDate fechaNacimiento) {
+
+    // El nombre de este método debería ser edadEsteAño, pero la ñ no será compatible.
 
     /**
      * Devuelve la edad (en este año) de esta persona.
      *
      * @return Un entero con la diferencia del año actual menos el año de nacimiento.
      */
-    public int edad() {
+    private int edadThisYear() {
         return LocalDate.now().getYear() - fechaNacimiento.getYear();
     }
 
     /**
-     * La edad actual.
+     * La edad actual teniendo en cuenta si ha cumplido años en este año.
      *
      * @return La edad actual.
      */
-    public int edadActual() {
+    public int edad() {
         var hoy = LocalDate.now();
         // Si el mes de la fecha de nacimiento es mayor del actual, aún no ha cumplido años.
         if (fechaNacimiento.getMonthValue() > hoy.getMonthValue()) {
-            return LocalDate.now().getYear() - fechaNacimiento.getYear() -1;
+            return edadThisYear() -1;
         }
         // Si es el mismo mes, pero el día de nacimiento es posterior, aún no ha cumplido años.
         else if (fechaNacimiento.getMonthValue() == hoy.getMonthValue()) {
             if (fechaNacimiento.getDayOfMonth() > hoy.getMonthValue()) {
-                return LocalDate.now().getYear() - fechaNacimiento.getYear() - 1;
+                return edadThisYear() - 1;
             }
         }
 
-        return edad();
+        return edadThisYear();
     }
 
     /**
-     * Para saber el día de la semana de nacimiento.
+     * Para saber el día de la semana de nacimiento en inglés.
      *
      * @return El día de la semana de nacimiento.
      */
     public String diaSemanaNacimiento() {
-        return diaSemanaNacimiento(false);
+        return fechaNacimiento.getDayOfWeek().toString();
     }
 
     /**
      * Muestra el día de la semana (en español en inglés).
-     * @param enEspañol True para mostrarlo en español.
+     * @param inSpanish True para mostrarlo en español.
      * @return El día de la semana de nacimiento.
      */
-    public String diaSemanaNacimiento(boolean enEspañol) {
-        if (enEspañol) {
+    public String diaSemanaNacimiento(boolean inSpanish) {
+        if (inSpanish) {
             return diaSemanaNacimientoES();
         }
-        return fechaNacimiento.getDayOfWeek().toString();
+        return diaSemanaNacimiento();
     }
 
     private static final String[] diasSemana =
@@ -78,16 +88,12 @@ public record Persona(String nombre, String apellidos, LocalDate fechaNacimiento
     /**
      * Mostrar los datos por la consola de esta persona.
      *
-     * @param enEspañol True si se muestra el día de la semana de nacimiento en español.
+     * @param inSpanish True si se muestra el día de la semana de nacimiento en español.
      */
-    public void mostrarDatos(boolean enEspañol) {
-//        System.out.printf("Nombre: %s\n", nombre);
-//        System.out.printf("Apellidos: %s\n", apellidos);
+    public void mostrarDatos(boolean inSpanish) {
         System.out.printf("Nombre y apellidos: %s %s\n", nombre, apellidos);
-        System.out.printf("Fecha nacimiento: %s (%s)\n", fechaNacimiento, diaSemanaNacimiento(enEspañol));
-        //System.out.printf("Día de la semana de nacimiento: %s\n", diaSemanaNacimiento(enEspañol));
-        System.out.printf("Edad actual: %s (en este año: %s)\n", edadActual(), edad());
-        //System.out.printf("Edad (en este año): %s\n", edad());
+        System.out.printf("Fecha nacimiento: %s (%s)\n", fechaNacimiento, diaSemanaNacimiento(inSpanish));
+        System.out.printf("Edad actual: %s (en este año: %s)\n", edad(), edadThisYear());
     }
 
     public static void main(String[] args) {
